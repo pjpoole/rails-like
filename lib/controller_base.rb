@@ -1,16 +1,16 @@
-require 'active_support/core_ext'
-require 'erb'
 require_relative './params'
 require_relative './session'
+require 'active_support/core_ext'
+require 'erb'
 
 class ControllerBase
-  attr_reader :params
+  attr_reader :req, :res, :params
 
   # Setup the controller
   def initialize(req, res, route_params = {})
     @req, @res = req, res
     @already_built_response = false
-    @params = Params.new(@req, route_params)
+    @params = Params.new(req, route_params)
   end
 
   # Helper method to alias @already_built_response
@@ -56,5 +56,7 @@ class ControllerBase
   # use this with the router to call action_name (:index, :show, :create...)
   def invoke_action(name)
     self.send(name)
+
+    render(name) unless already_built_response?
   end
 end
